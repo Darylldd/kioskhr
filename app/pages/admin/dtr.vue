@@ -1,4 +1,9 @@
 <script setup lang="ts">
+
+useSeoMeta({
+  title: 'All DTR'
+})
+
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
@@ -84,7 +89,7 @@ const selectedMonthLabel = computed(() => {
   return new Date(2000, parseInt(selectedMonth.value) - 1).toLocaleString('default', { month: 'long' })
 })
 </script>
-
+<Icon name="home" />
 <template>
   <div class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 

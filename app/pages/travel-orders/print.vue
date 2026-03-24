@@ -1,4 +1,7 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Print Travel Order'
+})
 definePageMeta({ layout: false })
 
 const order     = ref<any>(null)

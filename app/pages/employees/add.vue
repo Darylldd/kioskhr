@@ -1,4 +1,8 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Add Employee'
+})
+
 const isDark = ref(false)
 onMounted(() => {
   isDark.value = localStorage.getItem('theme') === 'dark'

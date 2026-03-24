@@ -1,4 +1,7 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'My DTR'
+})
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()

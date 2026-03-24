@@ -1,4 +1,7 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Log In'
+})
 import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'auth'})
@@ -46,8 +49,11 @@ const handleLogin = async () => {
 }
 </script>
 
+
 <template>
   <div class="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300 flex flex-col">
+
+
 
     <!-- Dark mode toggle -->
     <div class="absolute top-4 right-4 z-10">

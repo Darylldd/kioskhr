@@ -1,4 +1,8 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Upload Travel Order'
+})
+
 const isDark = ref(false)
 onMounted(async () => {
   isDark.value = localStorage.getItem('theme') === 'dark'

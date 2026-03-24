@@ -1,4 +1,8 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Travel Order List'
+})
+
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
