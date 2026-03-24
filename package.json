@@ -17,14 +17,17 @@
     "firebase": "^12.11.0",
     "firebase-admin": "^13.7.0",
     "mysql2": "^3.20.0",
+    "nodemailer": "^8.0.3",
     "nuxt": "^4.4.2",
     "pinia": "^3.0.4",
+    "puppeteer": "^24.40.0",
     "vue": "^3.5.30",
     "vue-router": "^5.0.3"
   },
   "devDependencies": {
     "@types/argon2": "^0.14.1",
     "@types/node": "^25.5.0",
+    "@types/nodemailer": "^7.0.11",
     "tailwindcss": "^3.4.19"
   }
 }

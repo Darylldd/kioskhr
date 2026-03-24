@@ -22,6 +22,11 @@ export default defineNuxtConfig({
     cloudinaryCloudName:  process.env.NUXT_CLOUDINARY_CLOUD_NAME,
   cloudinaryApiKey:     process.env.NUXT_CLOUDINARY_API_KEY,
   cloudinaryApiSecret:  process.env.NUXT_CLOUDINARY_API_SECRET,
+    smtpHost:   process.env.SMTP_HOST,
+  smtpPort:   process.env.SMTP_PORT   ?? '587',
+  smtpSecure: process.env.SMTP_SECURE ?? 'false',
+  smtpUser:   process.env.SMTP_USER,
+  smtpPass:   process.env.SMTP_PASS,
   public: {
     firebaseApiKey:            process.env.NUXT_PUBLIC_FIREBASE_API_KEY,
     firebaseAuthDomain:        process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -30,6 +35,7 @@ export default defineNuxtConfig({
     firebaseMessagingSenderId: process.env.NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     firebaseAppId:             process.env.NUXT_PUBLIC_FIREBASE_APP_ID,
     firebaseMeasurementId:     process.env.NUXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+     baseUrl: process.env.NUXT_PUBLIC_BASE_URL ?? 'http://localhost:3000',
   }
 },
 
