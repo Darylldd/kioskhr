@@ -1,7 +1,8 @@
 import { getFirestore } from 'firebase-admin/firestore'
 import { initializeApp, getApps, cert } from 'firebase-admin/app'
 import nodemailer from 'nodemailer'
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 
 const HR_DEPTS = ['HR', 'HRMU', 'Finance and Administrative Section (FAS)']
 
@@ -160,9 +161,13 @@ function buildPayslipHtml(row: any, baseUrl: string): string {
 }
 
 async function generatePdf(html: string): Promise<Buffer> {
+  // @sparticuz/chromium ships a Chromium binary that works on cloud/serverless hosts
+  const executablePath = await chromium.executablePath()
   const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args:            chromium.args,
+    defaultViewport: { width: 1280, height: 800 },
+    executablePath,
+    headless:        true,
   })
   try {
     const page = await browser.newPage()
@@ -224,7 +229,13 @@ export default defineEventHandler(async (event) => {
   const config  = useRuntimeConfig()
   const baseUrl = (config.public?.baseUrl as string | undefined) ?? 'http://localhost:3000'
   const html    = buildPayslipHtml(row, baseUrl)
-  const pdfBuf  = await generatePdf(html)
+  let pdfBuf: Buffer
+  try {
+    pdfBuf = await generatePdf(html)
+  } catch (pdfErr: any) {
+    console.error('[send-email] PDF generation failed:', pdfErr?.message ?? pdfErr)
+    throw createError({ statusCode: 500, message: `PDF generation failed: ${pdfErr?.message ?? 'Unknown error'}` })
+  }
 
   // ── send email ──
   const transporter = nodemailer.createTransport({
@@ -241,7 +252,8 @@ export default defineEventHandler(async (event) => {
   const cl = cutoffLabel(row.cutoff)
   const filename = `Payslip_${(row.employee_name || 'Employee').replace(/\s+/g, '_')}_${row.month}_${row.cutoff}.pdf`
 
-  await transporter.sendMail({
+  try {
+    await transporter.sendMail({
     from:    `"BFAR MIMAROPA" <${config.smtpUser}>`,
     to:      recipientEmail,
    subject: `Payslip — ${ml} (${cl})`,
@@ -255,8 +267,12 @@ html: `
         <p style="font-size:12px;color:#555;">Automated email — please do not reply.</p>
     </div>
 `,
-    attachments: [{ filename, content: pdfBuf, contentType: 'application/pdf' }],
-  })
+    attachments: [{ filename, content: pdfBuf!, contentType: 'application/pdf' }],
+    })
+  } catch (mailErr: any) {
+    console.error('[send-email] SMTP error:', mailErr?.message ?? mailErr)
+    throw createError({ statusCode: 500, message: `Email sending failed: ${mailErr?.message ?? 'Unknown error'}` })
+  }
 
   // ── audit log ──
   await db.collection('audit_logs').add({

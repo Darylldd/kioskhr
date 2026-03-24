@@ -13,7 +13,11 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
   ],
 
-
+nitro: {
+  externals: {
+    inline: ['@sparticuz/chromium']
+  }
+},
 
  runtimeConfig: {
   firebaseAdminProjectId:   process.env.NUXT_FIREBASE_ADMIN_PROJECT_ID,
