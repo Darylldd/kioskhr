@@ -21,7 +21,7 @@ const monthLabel = computed(() => {
 <template>
   <div class="ps-doc">
     <div class="payslip-container">
-      <img src="/images/uhi.png" alt="" style="position:absolute;top:0;left:0;width:220px;height:auto;opacity:0.4;pointer-events:none;z-index:0;" />
+      <img src="/images/uhi.png" alt="" style="position:absolute;top:0;left:0;width:220px;height:auto;opacity:0.9;pointer-events:none;z-index:0;" />
 
       <div style="display:flex;align-items:center;margin-bottom:10px;position:relative;z-index:1;">
         <img src="/images/bp.png"     alt="Bagong Pilipinas" style="height:48px;margin-right:10px;" />
