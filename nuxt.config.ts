@@ -1,0 +1,51 @@
+export default defineNuxtConfig({
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/png', href: '/dabfar.png' }
+      ]
+    }
+  },
+  devtools: { enabled: false },
+
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@pinia/nuxt',
+  ],
+
+nitro: {
+  externals: {
+    inline: ['@sparticuz/chromium']
+  }
+},
+
+ runtimeConfig: {
+  firebaseAdminProjectId:   process.env.NUXT_FIREBASE_ADMIN_PROJECT_ID,
+  firebaseAdminClientEmail: process.env.NUXT_FIREBASE_ADMIN_CLIENT_EMAIL,
+  firebaseAdminPrivateKey:  process.env.NUXT_FIREBASE_ADMIN_PRIVATE_KEY,
+    cloudinaryCloudName:  process.env.NUXT_CLOUDINARY_CLOUD_NAME,
+  cloudinaryApiKey:     process.env.NUXT_CLOUDINARY_API_KEY,
+  cloudinaryApiSecret:  process.env.NUXT_CLOUDINARY_API_SECRET,
+    emailUser: process.env.NUXT_EMAIL_USER,
+  emailPass: process.env.NUXT_EMAIL_PASS,
+  emailFrom: process.env.NUXT_EMAIL_FROM,
+  public: {
+    firebaseApiKey:            process.env.NUXT_PUBLIC_FIREBASE_API_KEY,
+    firebaseAuthDomain:        process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    firebaseProjectId:         process.env.NUXT_PUBLIC_FIREBASE_PROJECT_ID,
+    firebaseStorageBucket:     process.env.NUXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    firebaseMessagingSenderId: process.env.NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    firebaseAppId:             process.env.NUXT_PUBLIC_FIREBASE_APP_ID,
+    firebaseMeasurementId:     process.env.NUXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+     baseUrl: process.env.NUXT_PUBLIC_BASE_URL ?? 'http://localhost:3000',
+  }
+},
+
+  css: ['~/assets/css/main.css'],
+
+  typescript: {
+    strict: false,
+  },
+
+  compatibilityDate: '2024-11-01',
+})

@@ -1,0 +1,105 @@
+<script setup lang="ts">
+const props = defineProps<{ data: any }>()
+
+function fmt(n: any) {
+  return Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })
+}
+
+const cutoffLabel = computed(() => {
+  if (props.data.cutoff === 'FIRST_HALF')  return '1st Half'
+  if (props.data.cutoff === 'SECOND_HALF') return '2nd Half'
+  return props.data.cutoff
+})
+
+const monthLabel = computed(() => {
+  const [y, m] = (props.data.month || '').split('-')
+  const names = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER']
+  return m && y ? `${names[parseInt(m) - 1]} ${y}` : props.data.month
+})
+</script>
+
+<template>
+  <div class="ps-doc">
+    <div class="payslip-container">
+      <img src="/images/uhi.png" alt="" style="position:absolute;top:0;left:0;width:220px;height:auto;opacity:0.9;pointer-events:none;z-index:0;" />
+
+      <div style="display:flex;align-items:center;margin-bottom:10px;position:relative;z-index:1;">
+        <img src="/images/bp.png"     alt="Bagong Pilipinas" style="height:48px;margin-right:10px;" />
+        <img src="/images/dabfar.png" alt="BFAR"             style="height:48px;margin-right:12px;" />
+        <div style="font-size:10px;line-height:1.2;font-family:Arial,sans-serif;">
+          Republic of the Philippines | Department of Agriculture<br />
+          <strong>BUREAU OF FISHERIES AND AQUATIC RESOURCES</strong><br />
+          <span style="color:#1a4d80;font-weight:bold;font-size:11px;display:block;">REGIONAL FISHERIES OFFICE - MIMAROPA</span>
+          Sapul, Calapan City 5200, Oriental Mindoro<br />
+          <span style="color:blue;text-decoration:underline;">ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph</span>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-bottom:10px;">
+        <h2 style="margin:0;font-size:16px;letter-spacing:1px;line-height:1;font-family:Arial,sans-serif;">PAY SLIP</h2>
+        <strong style="text-transform:uppercase;font-size:12px;font-family:Arial,sans-serif;">
+          {{ monthLabel }} - {{ cutoffLabel }}
+        </strong>
+      </div>
+
+      <div style="margin-bottom:8px;font-size:12px;font-family:Arial,sans-serif;">
+        <strong>Name: {{ (data.employee_name || '').toUpperCase() }}</strong><br />
+        <strong>Account No.: {{ data.account_no }}</strong>
+      </div>
+
+      <table class="payroll-table">
+        <thead>
+          <tr class="bg-blue">
+            <th style="width:28%;">EARNINGS</th>
+            <th style="width:22%;">Amount</th>
+            <th style="width:32%;">DEDUCTIONS</th>
+            <th style="width:18%;">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Basic Pay</td>
+            <td class="text-right">{{ fmt(data.basic_pay) }}</td>
+            <td>LATE/ABSENCES</td>
+            <td class="text-right">{{ fmt(data.late_absences) }}</td>
+          </tr>
+          <tr><td rowspan="8" style="border-bottom:1px solid #000;"></td><td rowspan="8" style="border-bottom:1px solid #000;"></td><td>PAG-IBIG (MP1)</td><td class="text-right">{{ fmt(data.pagibig_mp1) }}</td></tr>
+          <tr><td>PAG-IBIG (MP2)</td><td class="text-right">{{ fmt(data.pagibig_mp2) }}</td></tr>
+          <tr><td>PAG-IBIG (MPL)</td><td class="text-right">{{ fmt(data.pagibig_mpl) }}</td></tr>
+          <tr><td>PAG-IBIG (Calamity)</td><td class="text-right">{{ fmt(data.pagibig_calamity) }}</td></tr>
+          <tr><td>SSS</td><td class="text-right">{{ fmt(data.sss) }}</td></tr>
+          <tr><td>PHILHEALTH</td><td class="text-right">{{ fmt(data.philhealth) }}</td></tr>
+          <tr><td>TAX</td><td class="text-right">{{ fmt(data.tax) }}</td></tr>
+          <tr><td>DISALLOWANCES</td><td class="text-right">{{ fmt(data.disallowances) }}</td></tr>
+          <tr style="font-weight:bold;background:#fafafa;">
+            <td>Total Earnings</td>
+            <td class="text-right">{{ fmt(data.basic_pay) }}</td>
+            <td style="text-align:right;">Total Deductions</td>
+            <td class="text-right">{{ fmt(data.totalDeductions) }}</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="border:none;"></td>
+            <td class="bg-blue" style="text-align:right;border:1px solid #000;">Net Pay</td>
+            <td class="bg-blue" style="border:1px solid #000;text-align:right;font-family:monospace;font-size:13px;font-weight:bold;">
+              {{ fmt(data.netPay) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:8px;text-align:right;font-style:italic;font-size:10px;font-family:Arial,sans-serif;">
+        Prepared by: HRMU
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+.ps-doc * { box-sizing: border-box; }
+.ps-doc { font-family: Arial, sans-serif; }
+.ps-doc .payslip-container { width:100%; max-width:720px; margin:0 auto; padding:20px 35px; background:#fff; position:relative; border-radius:6px; }
+.ps-doc .payroll-table { width:100%; border-collapse:collapse; border:1.5px solid #000; margin-top:10px; font-size:11px; }
+.ps-doc .payroll-table th, .ps-doc .payroll-table td { border:1px solid #000; padding:2px 8px; line-height:1.2; }
+.ps-doc .bg-blue { background-color:#c0ecf8 !important; font-weight:bold; text-align:center; }
+.ps-doc .text-right { text-align:right; font-family:'Courier New',Courier,monospace; font-weight:bold; }
+</style>
