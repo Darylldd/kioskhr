@@ -35,7 +35,7 @@ const monthLabel = computed(() => {
 <template>
   <div v-if="data" style="width:800px;margin:0 auto;font-family:Arial,sans-serif;padding:40px;background:#fff;position:relative;">
 
-    <img src="/images/uhi.png" alt="" style="position:absolute;top:0;left:0;width:350px;height:auto;opacity:0.9;" />
+    <img src="/images/uhi.png" alt="" style="position:absolute;top:-6px;left:0;width:350px;height:auto;opacity:0.9;" />
 
     <div style="display:flex;align-items:center;justify-content:flex-start;margin-bottom:20px;position:relative;z-index:1;">
       <img src="/images/bp.png"     alt="Bagong Pilipinas" style="height:65px;margin-right:15px;" />
