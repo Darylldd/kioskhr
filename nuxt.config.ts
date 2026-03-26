@@ -7,10 +7,10 @@ export default defineNuxtConfig({
     }
   },
   devtools: { enabled: false },
-
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
+    '@vercel/speed-insights'
   ],
 
 nitro: {
