@@ -76,8 +76,7 @@ async function buildPDF(p: any, baseURL: string): Promise<Buffer> {
   const bp = await urlToBase64(`${baseURL}/images/bp.png`)
   const bfar = await urlToBase64(`${baseURL}/images/dabfar.png`)
 
-  // --- HEADER LOGOS ---
-  doc.addImage(uhi, 'PNG', 0, 0, 100, 30)
+  doc.addImage(uhi, 'PNG', 0, -2, 100, 30)
 
   const logoSize = 24
   doc.addImage(bfar, 'PNG', margin + 2, 12, logoSize, logoSize)
