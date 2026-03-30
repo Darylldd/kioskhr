@@ -1,7 +1,5 @@
 import { getFirestore } from 'firebase-admin/firestore'
 import { initializeApp, getApps, cert } from 'firebase-admin/app'
-import fs from 'fs'
-import path from 'path'
 
 function initAdmin() {
   if (!getApps().length) {
@@ -17,10 +15,13 @@ function initAdmin() {
   return getFirestore()
 }
 
-function imgToBase64(publicPath: string) {
-  const filePath = path.join(process.cwd(), 'public', publicPath)
-  const file = fs.readFileSync(filePath)
-  return `data:image/png;base64,${file.toString('base64')}`
+/**
+ * ✅ NEW: fetch image from /public via URL and convert to base64
+ */
+async function urlToBase64(url: string) {
+  const res = await fetch(url)
+  const buffer = await res.arrayBuffer()
+  return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`
 }
 
 const LABEL_MAP: Record<string, string> = {
@@ -54,7 +55,10 @@ function fmt(v: any) {
   })
 }
 
-async function buildPDF(p: any): Promise<Buffer> {
+/**
+ * ✅ UPDATED: now accepts baseURL
+ */
+async function buildPDF(p: any, baseURL: string): Promise<Buffer> {
   const { jsPDF } = await import('jspdf')
 
   const doc = new jsPDF({
@@ -67,20 +71,19 @@ async function buildPDF(p: any): Promise<Buffer> {
   const margin = 10
   let y = 15
 
-  const uhi = imgToBase64('images/uhi.png')
-  const bp = imgToBase64('images/bp.png')
-  const bfar = imgToBase64('images/dabfar.png')
+  // 🔥 Load images via HTTP from /public
+  const uhi = await urlToBase64(`${baseURL}/images/uhi.png`)
+  const bp = await urlToBase64(`${baseURL}/images/bp.png`)
+  const bfar = await urlToBase64(`${baseURL}/images/dabfar.png`)
 
-  // --- LOGO SIZING & POSITIONING ---
-  // Banner size (uhi)
-  doc.addImage(uhi, 'PNG', 0, 0, 100, 30) 
+  // --- HEADER LOGOS ---
+  doc.addImage(uhi, 'PNG', 0, 0, 100, 30)
 
-  // Side Logo sizes (Increased for better visibility)
-  const logoSize = 24 
+  const logoSize = 24
   doc.addImage(bfar, 'PNG', margin + 2, 12, logoSize, logoSize)
   doc.addImage(bp, 'PNG', pageW - margin - logoSize - 2, 12, logoSize, logoSize)
 
-  y = 18 
+  y = 18
 
   doc.setFontSize(8)
   doc.setTextColor(0)
@@ -103,8 +106,14 @@ async function buildPDF(p: any): Promise<Buffer> {
   y += 3.5
   doc.text('Tel. No. (043) 288-6305 | Mobile No. 0917-107-2189', pageW / 2, y, { align: 'center' })
   y += 3.5
+
   doc.setTextColor(0, 0, 255)
-  doc.text('ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph', pageW / 2, y, { align: 'center' })
+  doc.text(
+    'ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph',
+    pageW / 2,
+    y,
+    { align: 'center' }
+  )
   y += 5
 
   doc.setDrawColor(0)
@@ -118,97 +127,101 @@ async function buildPDF(p: any): Promise<Buffer> {
   doc.setFont('helvetica', 'bold')
   doc.text('P A Y S L I P', margin, y)
   y += 5
+
   doc.setFontSize(9)
   doc.text(`${p.month?.toUpperCase()} ${p.year}`, margin, y)
   y += 4
 
-  const tableW = pageW - (margin * 2)
+  const tableW = pageW - margin * 2
   doc.setLineWidth(0.2)
-  
-  // EMP NAME / DIVISION Row
-  doc.rect(margin, y, tableW, 6) 
-  doc.line(pageW * 0.6, y, pageW * 0.6, y + 12) 
-  doc.setFontSize(8)
-  doc.text(`EMPL NAME:  ${(p.employee_name || '').toUpperCase()}`, margin + 2, y + 4.2)
-  doc.text(`DIVISION:  ${(p.division || 'N/A').toUpperCase()}`, pageW * 0.6 + 2, y + 4.2)
-  y += 6
 
-  // POSITION / SECTION Row
   doc.rect(margin, y, tableW, 6)
-  doc.text(`POSITION:  ${(p.position || 'N/A').toUpperCase()}`, margin + 2, y + 4.2)
-  doc.text(`SECTION:  ${(p.section || 'N/A').toUpperCase()}`, pageW * 0.6 + 2, y + 4.2)
+  doc.setFontSize(8)
+  doc.text(`EMPL NAME: ${(p.employee_name || '').toUpperCase()}`, margin + 2, y + 4.2)
+  doc.text(`DIVISION: ${(p.division || 'N/A').toUpperCase()}`, pageW * 0.6 + 2, y + 4.2)
   y += 6
 
-  // --- MAIN TABLE SETUP ---
+  doc.rect(margin, y, tableW, 6)
+  doc.text(`POSITION: ${(p.position || 'N/A').toUpperCase()}`, margin + 2, y + 4.2)
+  doc.text(`SECTION: ${(p.section || 'N/A').toUpperCase()}`, pageW * 0.6 + 2, y + 4.2)
+  y += 6
+
   const col1W = tableW * 0.28
   const col2W = tableW * 0.44
   const col3W = tableW * 0.28
   const headerH = 5
-  
-  // ADJUST THIS: bodyH controls the total vertical length of the empty table boxes
-  const bodyH = 30 
+  const bodyH = 30
 
   doc.setFont('helvetica', 'bold')
   doc.rect(margin, y, col1W, headerH)
   doc.rect(margin + col1W, y, col2W, headerH)
   doc.rect(margin + col1W + col2W, y, col3W, headerH)
-  
-  doc.text('GROSS EARNINGS', margin + (col1W / 2), y + 3.5, { align: 'center' })
-  doc.text('DEDUCTIONS', margin + col1W + (col2W / 2), y + 3.5, { align: 'center' })
-  doc.text('PERIODS', margin + col1W + col2W + (col3W / 2), y + 3.5, { align: 'center' })
+
+  doc.text('GROSS EARNINGS', margin + col1W / 2, y + 3.5, { align: 'center' })
+  doc.text('DEDUCTIONS', margin + col1W + col2W / 2, y + 3.5, { align: 'center' })
+  doc.text('PERIODS', margin + col1W + col2W + col3W / 2, y + 3.5, { align: 'center' })
   y += headerH
 
-  // Outer border and vertical dividers
   doc.rect(margin, y, tableW, bodyH)
   doc.line(margin + col1W, y, margin + col1W, y + bodyH)
   doc.line(margin + col1W + col2W, y, margin + col1W + col2W, y + bodyH)
 
-  doc.setFont('helvetica', 'normal')
-  
-  // ADJUST THIS: The spacing between rows of text (currently 4.5mm)
-  const rowSpacing = 4.5 
-  let contentY = y + 4 
+  const rowSpacing = 4.5
+  let contentY = y + 4
 
-  // Earnings
+  doc.setFont('helvetica', 'normal')
+
   doc.text('Monthly Salary', margin + 2, contentY)
   doc.text(fmt(p.monthly_salary), margin + col1W - 2, contentY, { align: 'right' })
+
   doc.text('PERA', margin + 2, contentY + rowSpacing)
   doc.text('2,000.00', margin + col1W - 2, contentY + rowSpacing, { align: 'right' })
 
-  // Deductions
-  const otherDeds = typeof p.other_deductions === 'string' ? JSON.parse(p.other_deductions) : p.other_deductions || []
+  const otherDeds =
+    typeof p.other_deductions === 'string'
+      ? JSON.parse(p.other_deductions)
+      : p.other_deductions || []
+
   const activeDeds: { label: string; value: string }[] = []
+
   for (const [key, label] of Object.entries(LABEL_MAP)) {
-    if (Number(p[key] || 0) > 0) activeDeds.push({ label, value: fmt(p[key]) })
+    if (Number(p[key] || 0) > 0) {
+      activeDeds.push({ label, value: fmt(p[key]) })
+    }
   }
+
   for (const d of otherDeds) {
-    if (d.name?.trim()) activeDeds.push({ label: d.name, value: fmt(d.amount) })
+    if (d.name?.trim()) {
+      activeDeds.push({ label: d.name, value: fmt(d.amount) })
+    }
   }
 
   activeDeds.forEach((d, i) => {
-    const itemY = y + 4 + (i * rowSpacing)
+    const itemY = y + 4 + i * rowSpacing
     if (itemY < y + bodyH - 2) {
       doc.text(d.label, margin + col1W + 2, itemY)
       doc.text(d.value, margin + col1W + col2W - 2, itemY, { align: 'right' })
     }
   })
 
-  // Periods
   doc.setFont('helvetica', 'bold')
   doc.text('1ST PERIOD', margin + col1W + col2W + 2, y + 4)
   doc.text(fmt(p.first_period), margin + tableW - 2, y + 4, { align: 'right' })
+
   doc.text('2ND PERIOD', margin + col1W + col2W + 2, y + 4 + rowSpacing)
   doc.text(fmt(p.second_period), margin + tableW - 2, y + 4 + rowSpacing, { align: 'right' })
 
   y += bodyH
 
-  // --- TOTALS FOOTER ---
   doc.setFont('helvetica', 'bold')
   doc.rect(margin, y, tableW, 7)
+
   doc.text('GROSS PAY', margin + 2, y + 4.5)
   doc.text(fmt(p.total_gross), margin + col1W - 2, y + 4.5, { align: 'right' })
+
   doc.text('TOTAL DEDUCTIONS', margin + col1W + 2, y + 4.5)
   doc.text(fmt(p.total_deductions), margin + col1W + col2W - 2, y + 4.5, { align: 'right' })
+
   doc.text('TOTAL NET PAY', margin + col1W + col2W + 2, y + 4.5)
   doc.text(fmt(p.net_pay), margin + tableW - 2, y + 4.5, { align: 'right' })
 
@@ -220,20 +233,23 @@ export default defineEventHandler(async (event) => {
   const actorId = cookie['employee_id']
   const actorName = cookie['employee_name'] ?? ''
 
-  if (!actorId) throw createError({ statusCode: 401, message: 'Unauthorized.' })
+  if (!actorId) throw createError({ statusCode: 401 })
 
   const id = getRouterParam(event, 'id') ?? ''
-  if (!id) throw createError({ statusCode: 400, message: 'Invalid ID.' })
+  if (!id) throw createError({ statusCode: 400 })
 
   const db = initAdmin()
   const payslipDoc = await db.collection('admin_payslips').doc(id).get()
 
-  if (!payslipDoc.exists) throw createError({ statusCode: 404, message: 'Payslip not found.' })
+  if (!payslipDoc.exists) throw createError({ statusCode: 404 })
 
   const p = payslipDoc.data() as any
-  if (!p.email) throw createError({ statusCode: 400, message: 'Employee has no email address on file.' })
+  if (!p.email) throw createError({ statusCode: 400 })
 
-  const pdfBuffer = await buildPDF(p)
+  const baseURL = getRequestURL(event).origin
+
+  const pdfBuffer = await buildPDF(p, baseURL)
+
   const nodemailer = await import('nodemailer')
   const config = useRuntimeConfig()
 
@@ -252,12 +268,10 @@ export default defineEventHandler(async (event) => {
     html: `<div style="font-family:Arial;font-size:14px;">
       <p>Dear <strong>${p.employee_name}</strong>,</p>
       <p>Please find attached your payslip for <strong>${p.month} ${p.year}</strong>.</p>
-      <hr/>
-      <p style="font-size:12px;color:#888;">Automated email</p>
     </div>`,
     attachments: [
       {
-        filename: `Payslip_${p.month}_${p.year}_${(p.employee_name || '').replace(/\s+/g, '_')}.pdf`,
+        filename: `Payslip_${p.month}_${p.year}.pdf`,
         content: pdfBuffer,
         contentType: 'application/pdf',
       },
