@@ -1,4 +1,7 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Admin Payslip Create'
+})
 const isDark = ref(false)
 const router = useRouter()
 

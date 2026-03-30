@@ -1,4 +1,7 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Preview'
+})
 const router  = useRouter()
 const loading = ref(false)
 const error   = ref('')

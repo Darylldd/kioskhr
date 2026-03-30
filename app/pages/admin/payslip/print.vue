@@ -1,4 +1,7 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Print Admin Payslip'
+})
 definePageMeta({ layout: false })
 
 const payslip  = ref<any>(null)

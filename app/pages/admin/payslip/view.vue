@@ -1,4 +1,7 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'View Payslip'
+})
 const isDark   = ref(false)
 const router   = useRouter()
 const payslip  = ref<any>(null)
