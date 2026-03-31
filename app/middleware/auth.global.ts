@@ -11,21 +11,16 @@ export default defineNuxtRouteMiddleware((to) => {
   const dept          = employee?.department ?? ''
   const role          = employee?.role ?? ''
 
-  // ── Public route — always allow ──────────────────────────
   if (to.path === '/login') {
-    // Already logged in → go to dashboard
     if (isLoggedIn) return navigateTo('/dashboard')
     return
   }
 
-  // ── Not logged in → go to login ──────────────────────────
   if (!isLoggedIn) {
     return navigateTo('/login')
   }
 
-  // ── Role-based route guards ───────────────────────────────
 
-  // HR-only routes (replaces onlyHR / onlyHRAdmin)
   const hrOnlyRoutes = [
     '/employees',
     '/employees/add',
@@ -39,13 +34,12 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo('/dashboard')
   }
 
-  // Admin DTR routes (replaces onlyAuthorizedDTR)
   const authorizedDTRDepts = ['HR', 'HRMU', 'Finance and Administrative Section (FAS)', 'admin']
   if (to.path.startsWith('/admin/dtr') && !authorizedDTRDepts.includes(dept)) {
     return navigateTo('/dashboard')
   }
 
-  // Audit logs (replaces isAdmin / ensureAdmin)
+
   if (to.path.startsWith('/audit-logs') && role !== 'hr' && !authorizedDTRDepts.includes(dept)) {
     return navigateTo('/dashboard')
   }
