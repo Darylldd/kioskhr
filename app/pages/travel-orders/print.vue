@@ -31,7 +31,6 @@ function printPage() {
 
 <template>
   <div v-if="order">
-    <!-- Print button (hidden on print via CSS) -->
     <div class="print-btn-wrap">
    <button class="print-btn" @click="printPage()">🖨️ Print</button>
     </div>

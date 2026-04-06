@@ -1,4 +1,7 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Audit Logs'
+})
 const isDark = ref(false)
 onMounted(() => {
   isDark.value = localStorage.getItem('theme') === 'dark'

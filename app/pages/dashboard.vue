@@ -2,16 +2,10 @@
 useSeoMeta({
   title: 'Dashboard'
 })
-
 import { useAuthStore } from '~/stores/auth'
-
-
-
 const authStore = useAuthStore()
 const employee  = computed(() => authStore.employee)
 const router    = useRouter()
-
-// ── Dark mode ──────────────────────────────────────────────
 const isDark = ref(false)
 onMounted(() => {
   isDark.value = localStorage.getItem('theme') === 'dark'
@@ -22,14 +16,10 @@ const toggleTheme = () => {
   document.documentElement.classList.toggle('dark', isDark.value)
   localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
 }
-
-// ── Modals ─────────────────────────────────────────────────
 const showPasslip = ref(false)
 const showPayslip = ref(false)
 const showProfile = ref(false)
 const payslipTab  = ref<'create' | 'list'>('create')
-
-// Close on Escape key
 onMounted(() => {
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -39,8 +29,6 @@ onMounted(() => {
     }
   })
 })
-
-// ── Logout ─────────────────────────────────────────────────
 const handleLogout = async () => {
   await $fetch('/api/auth/logout', { method: 'POST' })
   authStore.logout()
@@ -51,9 +39,6 @@ const handleLogout = async () => {
 <template>
   <div class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-    <!-- ══════════════════════════════════════════
-         TOP NAVIGATION BAR
-    ══════════════════════════════════════════ -->
     <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
 

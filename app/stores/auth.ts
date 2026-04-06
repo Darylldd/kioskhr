@@ -1,69 +1,48 @@
 import { defineStore } from 'pinia'
 
-interface Employee {
-  id: string
-  employee_no: string
-  first_name: string
-  last_name: string
-  middle_name: string
-  department: string
-  position: string
-  profile_pic: string | null
-  role: 'employee' | 'hr'
-}
-
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    employee: null as Employee | null,
+    employee:  null as any,
     isLoggedIn: false,
   }),
 
   getters: {
-    isHR: (state) => state.employee?.role === 'hr',
-    isAdminDept: (state) => {
-      const adminDepts = ['HR', 'HRMU', 'Finance and Administrative Section (FAS)', 'admin']
-      return adminDepts.includes(state.employee?.department ?? '')
-    },
-    fullName: (state) =>
-      state.employee ? `${state.employee.first_name} ${state.employee.last_name}` : '',
+    isHR:        (state) => ['HR', 'HRMU', 'Finance and Administrative Section (FAS)'].includes(state.employee?.department ?? ''),
+    isAdminDept: (state) => ['HR', 'HRMU', 'Finance and Administrative Section (FAS)', 'admin'].includes(state.employee?.department ?? ''),
+    fullName:    (state) => state.employee ? `${state.employee.first_name} ${state.employee.last_name}` : '',
   },
 
   actions: {
-    setEmployee(emp: Employee) {
-      this.employee = emp
-      this.isLoggedIn = true
-      if (import.meta.client) {
-        localStorage.setItem('employee', JSON.stringify(emp))
+    loadFromStorage() {
+      try {
+        const raw = localStorage.getItem('employee')
+        if (raw) {
+          this.employee   = JSON.parse(raw)
+          this.isLoggedIn = true
+        } else {
+          this.employee   = null
+          this.isLoggedIn = false
+        }
+      } catch {
+        this.employee   = null
+        this.isLoggedIn = false
+        localStorage.removeItem('employee')
       }
     },
-  loadFromStorage() {
-  if (import.meta.client) {
-    const stored = localStorage.getItem('employee')
-    const storedVersion = localStorage.getItem('app_version')
-    const currentVersion = useRuntimeConfig().public.appVersion
 
-    if (storedVersion !== String(currentVersion)) {
-      localStorage.removeItem('employee')
-      localStorage.setItem('app_version', String(currentVersion))
-      return
-    }
-
-    if (stored) {
-      try {
-        this.employee = JSON.parse(stored)
-        this.isLoggedIn = true
-      } catch {
-        localStorage.removeItem('employee')
-      }
-    }
-  }
-},
+    setEmployee(emp: any) {
+      this.employee   = emp
+      this.isLoggedIn = true
+      localStorage.setItem('employee', JSON.stringify(emp))
+    },
 
     logout() {
-      this.employee = null
+      this.employee   = null
       this.isLoggedIn = false
+      localStorage.removeItem('employee')
+
       if (import.meta.client) {
-        localStorage.removeItem('employee')
+        window.location.href = '/login'
       }
     },
   },

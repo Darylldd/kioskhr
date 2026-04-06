@@ -1,21 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: [],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
-
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
-  content: [
-    './app/**/*.{vue,js,ts}',
-    './components/**/*.{vue,js,ts}',
-    './layouts/**/*.{vue,js,ts}',
-    './pages/**/*.{vue,js,ts}',
-  ],
+  content: [],
   theme: {
     extend: {
       fontFamily: {
@@ -37,28 +23,43 @@ module.exports = {
         },
       },
       keyframes: {
-        'slide-up': {
-          '0%':   { opacity: '0', transform: 'translateY(12px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        'modal-in': {
-          '0%':   { opacity: '0', transform: 'scale(0.96) translateY(8px)' },
-          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+        'fade-in': {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to:   { opacity: '1', transform: 'translateY(0)'   },
         },
         'slide-down': {
-          '0%':   { opacity: '0', transform: 'translateY(-8px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          from: { opacity: '0', transform: 'translateY(-6px)' },
+          to:   { opacity: '1', transform: 'translateY(0)'    },
         },
-        'fade-in': {
-          '0%':   { opacity: '0' },
-          '100%': { opacity: '1' },
+        'slide-up': {
+          from: { opacity: '0', transform: 'translateY(16px)' },
+          to:   { opacity: '1', transform: 'translateY(0)'    },
+        },
+        'slide-in-right': {
+          from: { opacity: '0', transform: 'translateX(60px)' },
+          to:   { opacity: '1', transform: 'translateX(0)'    },
+        },
+        'modal-in': {
+          from: { opacity: '0', transform: 'scale(0.96) translateY(8px)' },
+          to:   { opacity: '1', transform: 'scale(1) translateY(0)'      },
+        },
+        'fade-scale-in': {
+          from: { opacity: '0', transform: 'scale(0.97)' },
+          to:   { opacity: '1', transform: 'scale(1)'    },
+        },
+        'pulse-soft': {
+          '0%, 100%': { opacity: '1'   },
+          '50%':      { opacity: '0.6' },
         },
       },
       animation: {
-        'slide-up':   'slide-up 0.35s ease forwards',
-        'modal-in':   'modal-in 0.25s ease forwards',
-        'slide-down': 'slide-down 0.3s ease forwards',
-        'fade-in':    'fade-in 0.45s ease forwards',
+        'fade-in':       'fade-in 0.35s ease forwards',
+        'slide-down':    'slide-down 0.3s ease forwards',
+        'slide-up':      'slide-up 0.35s ease forwards',
+        'slide-in-right':'slide-in-right 0.4s ease forwards',
+        'modal-in':      'modal-in 0.25s ease forwards',
+        'fade-scale-in': 'fade-scale-in 0.3s ease forwards',
+        'pulse-soft':    'pulse-soft 2s ease-in-out infinite',
       },
     },
   },
