@@ -23,7 +23,11 @@ export default defineEventHandler(async (event) => {
   if (!employeeId) {
     throw createError({ statusCode: 401, message: 'Unauthorized.' })
   }
-
+const OFFICE_IPS = ['122.53.222.239']
+const clientIp   = getRequestIP(event) ?? ''
+if (!OFFICE_IPS.some(ip => clientIp.startsWith(ip))) {
+  throw createError({ statusCode: 403, message: 'DTR can only be submitted from the office network.' })
+}
   const db  = initAdmin()
   const now = new Date()
   const todayStr = now.toISOString().split('T')[0]
